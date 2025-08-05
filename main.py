@@ -1,45 +1,26 @@
 import pandas as pd
-import hdbscan
-import re
-from sentence_transformers import SentenceTransformer
 from collections import Counter
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.cluster import DBSCAN
-import numpy as np
 
-# === Step 1: Load CSV ===
-df = pd.read_csv("all extra history.csv", header=None)
-df.columns = [
-    "title", "published", "views", "likes", "comments",
-    "video_id", "duration", "url"
-]
-df["published"] = pd.to_datetime(df["published"])
-df["days_since_start"] = (df["published"] - df["published"].min()).dt.days
+# Pandas display settings
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_colwidth', None)
+pd.set_option('display.width', 1000)
 
-# === Step 2: Create title embeddings ===
-model = SentenceTransformer("all-MiniLM-L6-v2")
-embeddings = model.encode(df["title"].tolist())
+# Read your dataset
+df = pd.read_csv("eh no char.csv")
 
-# === Step 3: Initial clustering by title ===
-title_clusterer = hdbscan.HDBSCAN(min_cluster_size=2, metric="euclidean")
-df["title_cluster"] = title_clusterer.fit_predict(embeddings)
+# Define regex pattern to match the target phrases (case-insensitive)
+pattern = r'\b(extra history|us train history|roman history|chinese history|world history|us history|british history|naval history|religious history|european history|irish history|italian history|scandinavian history|japanese history|american history|native american history|english history|egyptian history|hawaiian history|scottish history|south american history|wwi history|medical history|russian history|australian history|middle east history)\b'
 
-# === Step 4: Clean titles ===
-def clean_title(title):
-    title = title.strip()
-    title = re.sub(r'\s*\|\s*', ' - ', title)
-    title = re.sub(r'\s*-\s*Extra History', '', title, flags=re.IGNORECASE)
-    title = re.sub(r'\s*-\s*European History', '', title, flags=re.IGNORECASE)
-    title = re.sub(r'\s*-\s*World War II', '', title, flags=re.IGNORECASE)
-    title = re.sub(r'\s*-\s*WW2', '', title, flags=re.IGNORECASE)
-    title = re.sub(r'\s*-\s*LIES', '', title, flags=re.IGNORECASE)
-    title = re.sub(r'\s*-\s*Part\s*\d+', '', title, flags=re.IGNORECASE)
-    title = re.sub(r'(.*?)(\d+\s*:\s*)', r'\1', title)
-    return title.strip()
+# Remove the phrases from the 'title' column using regex
+df['title'] = df['title'].str.replace(pattern, '', case=False, regex=True).str.replace(r'\s{2,}', ' ', regex=True).str.strip()
+df.to_csv('eh.csv')
 
-def extract_common_series_name(titles):
-    cleaned_titles = [clean_title(t) for t in titles]
-    tokenized = [t.split(' - ') for t in cleaned_titles]
+# Function to extract the most common n-gram from a list of titles
+def extract_common_ngram(titles):
+    cleaned_titles = [t.strip().lower() for t in titles if isinstance(t, str)]
+    tokenized = [t.split(' ') for t in cleaned_titles]
 
     ngram_counter = Counter()
     for tokens in tokenized:
@@ -54,52 +35,23 @@ def extract_common_series_name(titles):
 
     return common_ngrams[0] if common_ngrams else "Unnamed Series"
 
-# === Step 5: Date-based pruning within title clusters using DBSCAN ===
-df["final_cluster"] = -1
-final_series_names = {}
-final_cluster_id = 0
+# Function to slide over the DataFrame and run the n-gram function on each window
+def sliding_window_ngram(df, window_size=20, step=5):
+    n = len(df)
+    for start in range(0, n, step):
+        end = min(start + window_size, n)
+        window_df = df.iloc[start:end]
+        print(f"\n🔍 Videos from index {start} to {end-1} (total {len(window_df)}):")
 
-# Max allowed days between episodes in a series
-max_gap_days = 22
+        titles = window_df['title'].tolist()
+        common_ngram = extract_common_ngram(titles)
 
-for t_cluster in df["title_cluster"].unique():
-    if t_cluster == -1:
-        continue
-    group = df[df["title_cluster"] == t_cluster].copy()
+        print(f"🏷️  Most common n-gram: {common_ngram}")
+        print(window_df[['title', 'published']])
 
-    # Use raw days for DBSCAN (no scaling)
-    dates = group["days_since_start"].values.reshape(-1, 1)
-    dbscan = DBSCAN(eps=max_gap_days, min_samples=2, metric='euclidean')
-    group["date_subcluster"] = dbscan.fit_predict(dates)
+        if end == n:
+            break
 
-    for sub_id in group["date_subcluster"].unique():
-        if sub_id == -1:
-            continue
-        sub = group[group["date_subcluster"] == sub_id]
-        if len(sub) < 2:
-            continue
-
-        # Assign final cluster ID and series name
-        df.loc[sub.index, "final_cluster"] = final_cluster_id
-        name = extract_common_series_name(sub["title"].tolist())
-        final_series_names[final_cluster_id] = name
-        final_cluster_id += 1
-
-# Add series name to dataframe
-df["series_name"] = df["final_cluster"].apply(lambda cid: final_series_names.get(cid, "Unclustered"))
-
-# === Step 6: Sort & Save ===
-df = df.sort_values(by=["series_name", "published"])
-df.to_csv("extra_history_series_grouped.csv", index=False)
-
-# === Step 7: Save Summary to File ===
-output_path = "series_summary.txt"
-with open(output_path, "w", encoding="utf-8") as f:
-    f.write("📚 Series Groups with Titles:\n")
-    for sid, name in final_series_names.items():
-        cluster_df = df[df["final_cluster"] == sid].sort_values(by="published")
-        f.write(f"\n[{sid}] {name} — {len(cluster_df)} videos\n")
-        for _, row in cluster_df.iterrows():
-            f.write(f"  - {row['published'].date()} | {row['title']} | {row['url']}\n")
-
-print(f"✅ Series summary written to {output_path}")
+# Example usage:
+# Reverse the order if needed (e.g., newest to oldest)
+sliding_window_ngram(df[['title', 'published']].iloc[::-1].reset_index(drop=True), window_size=20, step=5)
