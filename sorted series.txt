@@ -211,7 +211,7 @@ Sitting Bull - LIES - Native American History - Extra History \ https://www.yout
 Shootout at the OK Corral: Why it Went Down - US History - Part 1 - Extra History \ https://www.youtube.com/watch?v=LSW1HCNbsYE
 Shootout at the OK Corral: The Showdown - US History - Part 2 - Extra History \ https://www.youtube.com/watch?v=mLQidyCs_EE
 
-[26] Battle of Blair Mountain - US History
+[26] Battle of Blair Mountain
 "Union Busting" - Battle of Blair Mountain - US History - Part 1 - Extra History \ https://www.youtube.com/watch?v=vg9xywAxb10
 Get Your Rifles - Battle of Blair Mountain - US History - Part 2 - Extra History \ https://www.youtube.com/watch?v=jklZYrkEtEs
 
@@ -242,7 +242,7 @@ Henry Ford: Ignorant Anarchist - US History - Part 4 - Extra History \ https://w
 Henry Ford: A Tragic End - US History - Part 5 - Extra History \ https://www.youtube.com/watch?v=aa4n-NpfjEs
 Henry Ford - LIES - US History - Extra History \ https://www.youtube.com/watch?v=WnksQgTVtXA
 
-[32] The Buddhist Expansion - World History
+[32] The Buddhist Expansion
 Siddhartha and Ancient Buddhism -The Buddhist Expansion - World History - Part 1 - Extra History \ https://www.youtube.com/watch?v=jMX-YgdFwd4
 Serial Killer Monk - The Buddhist Expansion - World History - Part 2 - Extra History \ https://www.youtube.com/watch?v=WTLLdDdiXlw
 Ashoka the Great - The Buddhist Expansion - World History - Part 3 - Extra History \ https://www.youtube.com/watch?v=Vpv6ZsXR1aA
@@ -436,7 +436,7 @@ The Inca Empire - Andean Apocalypse - Extra History - Part 4 \ https://www.youtu
 The Inca Empire - A God Taken Hostage - Extra History - Part 5 \ https://www.youtube.com/watch?v=zHGWIKnCDtE
 Inca Empire - Lies - Extra History \ https://www.youtube.com/watch?v=e96B2arsdkc
 
-[57] Defense of Poland 1
+[57] Defense of Poland
 Defense of Poland 1: The Battle of the Border | WW2 | Extra History \ https://www.youtube.com/watch?v=I47vCycUSW4
 Defense of Poland 2: Under Siege | WW2 | Extra History \ https://www.youtube.com/watch?v=20fFU_OqB0M
 
@@ -754,10 +754,6 @@ Hiawatha - Government for the People - Extra History - Part 2 \ https://www.yout
 Mary Seacole - A Bold Front to Fortune - Extra History - Part 1 \ https://www.youtube.com/watch?v=xT9BTuBtCJs
 Mary Seacole - Mother Seacole in the Crimea - Extra History - Part 2 \ https://www.youtube.com/watch?v=eADLWvWqK5Q
 
-[124] Middle East: Odenathus
-Middle East: Palmyra Today - Afterword - Extra History \ https://www.youtube.com/watch?v=v-GgknZYu3s
-Middle East: Odenathus - Ghosts of the Desert - Extra History \ https://www.youtube.com/watch?v=0Pf6PMSB8uo
-
 [125] Syphilis
 Syphilis - The Great Imitator - Medical History - Extra History - Part 1 \ https://www.youtube.com/watch?v=gnwKRHBiWb4
 Syphilis - The Killer Cure - Medical History - Extra History - Part 2 \ https://www.youtube.com/watch?v=fdjBBGJvem0
@@ -771,6 +767,8 @@ History of Coffee - Brewing Controversy - World History - Extra History - Part 1
 History of Coffee  - Global Addiction - World History - Extra History - Part 2 \ https://www.youtube.com/watch?v=_MO4pjidfgU
 
 [128] Singles
+Middle East: Palmyra Today - Afterword - Extra History \ https://www.youtube.com/watch?v=v-GgknZYu3s
+Middle East: Odenathus - Ghosts of the Desert - Extra History \ https://www.youtube.com/watch?v=0Pf6PMSB8uo
 The Beast of Gévaudan | Terror in the French Countryside | European History | Extra History \ https://www.youtube.com/watch?v=qDf93nFGZuc
 The Harlem Renaissance - An Explosion of Art - US History - Extra History \ https://www.youtube.com/watch?v=8kZ0gZMCx9U
 The Harlem Hellfighters | The 369th Infantry | US History | Extra History \ https://www.youtube.com/watch?v=RV-c62e7g1k
