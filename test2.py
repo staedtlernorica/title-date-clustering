@@ -66,6 +66,12 @@ eh_epis["odd even year"] = eh_epis["year"].apply(lambda y: "Even Year" if int(y)
 
 eh_epis['episode number'] = eh_epis['episode number'].astype(int)
 
+# Get today's date (normalized to remove time)
+today = pd.Timestamp.today().normalize()
+
+# Calculate difference in days
+eh_epis['days since published'] = (today - eh_epis['published']).dt.days
+
 # print(eh_epis[['title', 'series name', 'episode number']])
 # print(eh_epis.columns)
 
@@ -123,14 +129,16 @@ app.layout = html.Div([
     ]),
 
     dcc.Checklist(
-        id="episode-selector",
-        options=[{"label": f"Ep {ep}", "value": ep} for ep in available_episodes],
-        value=available_episodes,
-        inline=True,
-        inputStyle={"margin-right": "5px", "margin-left": "10px"}
+    id="episode-selector",
+    options=[{"label": f"Ep {ep}", "value": ep} for ep in available_episodes],
+    value=available_episodes,
+    inline=True,
+    inputStyle={"margin-right": "5px", "margin-left": "10px"},
+    persistence=True,
+    persistence_type="local"  # persists across browser reloads
     ),
 
-    dcc.Graph(id="scatter-plot", config={"displayModeBar": False})
+    dcc.Graph(id="scatter-plot", config={"displayModeBar": True})
 ])
 
 
@@ -155,7 +163,16 @@ def update_figure(selected_episodes, toggle_value):
             mode="text",
             name=f"{group}",
             textfont=dict(color=color_map.get(group, "black"), size=12),
-            hovertext=df_group["title"],
+            hovertext=[
+                f"{row['title']}<br>"
+                f"Published: {row['published']} ({row['days since published']} days ago)<br>"
+                f"Views: {row['views']:,}<br>"
+                f"Likes: {row['likes']:,}<br>"
+                f"Comments: {row['comments']:,}<br>"
+                f"Views/day: {row['views']/row['days since published']:.2f}<br>"
+                f"Views/likes: {row['views']/row['likes']:.2f}<br>"
+                for _, row in df_group.iterrows()
+            ],
             hoverinfo="text"
         ))
 
