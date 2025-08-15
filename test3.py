@@ -19,9 +19,6 @@ if "tagged_data" not in st.session_state:
 if "mass_checkboxes" not in st.session_state:
     st.session_state.mass_checkboxes = {title: False for title in titles}
 
-if "dropdown_select" not in st.session_state:
-    st.session_state.dropdown_select = []
-
 if "history" not in st.session_state:
     st.session_state.history = [copy.deepcopy(st.session_state.tagged_data)]
 
@@ -44,14 +41,12 @@ if "clear_all_clicked" not in st.session_state:
 if st.session_state.select_all_clicked:
     for title in titles:
         st.session_state.mass_checkboxes[title] = True
-    st.session_state.dropdown_select = titles[:]
     st.session_state.select_all_clicked = False
     st.rerun()
 
 if st.session_state.clear_all_clicked:
     for title in titles:
         st.session_state.mass_checkboxes[title] = False
-    st.session_state.dropdown_select = []
     st.session_state.clear_all_clicked = False
     st.rerun()
 
@@ -69,20 +64,8 @@ with col2:
         st.session_state.clear_all_clicked = True
         st.rerun()
 
-# --- Dropdown Selection ---
-dropdown_selected = st.multiselect(
-    "🔽 Select videos (dropdown):",
-    titles,
-    default=st.session_state.dropdown_select,
-    key="dropdown_select"
-)
-
-# --- Sync checkboxes from dropdown ---
-for title in titles:
-    st.session_state.mass_checkboxes[title] = title in dropdown_selected
-
 # --- Checkbox list ---
-st.markdown("### ✅ Or check videos below:")
+st.markdown("### ✅ Check videos to apply tags:")
 for title in titles:
     st.session_state.mass_checkboxes[title] = st.checkbox(
         label=title,
@@ -155,11 +138,11 @@ with col4:
         else:
             st.warning("No more redo steps available.")
 
-# --- Undo history display ---
-st.markdown("### 🧠 Undo History")
-for idx, snapshot in enumerate(st.session_state.history):
-    tagged_count = len([v for v in snapshot.values() if v])
-    st.markdown(f"- State {idx + 1}: {tagged_count} video(s) tagged")
+# # --- Undo history display ---
+# st.markdown("### 🧠 Undo History")
+# for idx, snapshot in enumerate(st.session_state.history):
+#     tagged_count = len([v for v in snapshot.values() if v])
+#     st.markdown(f"- State {idx + 1}: {tagged_count} video(s) tagged")
 
 # --- Highlighted HTML table ---
 st.markdown("### 📄 Current Tags")
@@ -184,14 +167,13 @@ def render_highlighted_table():
     table = f"""
     <style>
         .flash-tag {{
-            background-color: #ffe599;
-            padding: 2px 4px;
-            border-radius: 4px;
-            animation: fadeOut 4s forwards;
+            color: #e63946; /* bright red text */
+            font-weight: bold;
+            animation: fadeOutColor 4s forwards;
         }}
-        @keyframes fadeOut {{
-            0% {{ background-color: #ffe599; }}
-            100% {{ background-color: transparent; }}
+        @keyframes fadeOutColor {{
+            0% {{ color: #e63946; }}
+            100% {{ color: inherit; }}/* fade back to normal text color */
         }}
         table.custom {{
             width: 100%;
@@ -219,13 +201,30 @@ def render_highlighted_table():
 
 render_highlighted_table()
 
-# --- Clear highlight after 4 seconds (only once) ---
+# --- Handle highlight clear logic without flicker ---
 params = st.experimental_get_query_params()
 if params.get("highlight") == ["true"]:
-    time.sleep(4)
-    st.session_state.recently_added_tags = {}
-    st.experimental_set_query_params()
-    st.rerun()
+    if "highlight_start_time" not in st.session_state:
+        st.session_state.highlight_start_time = time.time()
+    elif time.time() - st.session_state.highlight_start_time > 4:
+        # Clear highlight params and session state
+        st.session_state.recently_added_tags = {}
+        st.experimental_set_query_params()
+        del st.session_state.highlight_start_time
+        # No st.rerun() here, just let natural rerender happen
+else:
+    # If highlight is not set, make sure no timer leftover
+    if "highlight_start_time" in st.session_state:
+        del st.session_state.highlight_start_time
+
+
+# --- Clear highlight after 4 seconds (only once) ---
+# params = st.experimental_get_query_params()
+# if params.get("highlight") == ["true"]:
+#     time.sleep(4)
+#     st.session_state.recently_added_tags = {}
+#     st.experimental_set_query_params()
+#     st.rerun()
 
 # --- Export ---
 st.markdown("### 💾 Export")
